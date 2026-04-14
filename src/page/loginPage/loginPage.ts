@@ -1,31 +1,30 @@
 import { Locator, Page } from 'playwright';
 import { expect } from '@playwright/test';
 import { GlobalPage } from '../globalPage/globalPage';
+import { InputComponent } from '../../components/input/input';
+import { ButtonComponent } from '../../components/button/button';
 
 export class LoginPage extends GlobalPage {
-  readonly loginInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
+  readonly loginInput: InputComponent;
+  readonly passwordInput: InputComponent;
+  readonly loginButton: ButtonComponent;
 
   constructor(page: Page) {
-    super(page);
-    this.loginInput = page.locator('input[name="username"]');
-    this.passwordInput = page.locator('input[name="password"]');
-    this.loginButton = page.getByRole('button', { name: 'Login' });
+    super(page, '/login');
+
+    this.loginInput = new InputComponent(page.locator('input[name="username"]'));
+    this.passwordInput = new InputComponent(page.locator('input[name="password"]'));
+    this.loginButton = new ButtonComponent(page.getByRole('button', { name: 'Login' }));
   }
 
-  async login(home: string): Promise<void> {
-    //TODO это вынес в env
-    // const idealLogin = 'administrator';
-    // const idealPassword = 'administrator';
-
-    const login = await this.loginInput.inputValue();
-    const password = await this.passwordInput.inputValue();
+  async login(): Promise<void> {
+    const login = await this.loginInput.getValue();
+    const password = await this.passwordInput.getValue();
 
     expect(login).toEqual(process.env.IDEALOGIN);
     expect(password).toEqual(process.env.IDELPASSWORD);
 
     await this.loginButton.click();
-    await expect(this.page).toHaveURL(process.env.SITE + `${home}`);
+    await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`);
   }
 }

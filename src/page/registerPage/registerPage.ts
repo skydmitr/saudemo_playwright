@@ -1,34 +1,52 @@
 import { GlobalPage } from '../globalPage/globalPage';
-import { Locator, Page } from 'playwright';
-import { expect } from '@playwright/test';
-import { e } from '@faker-js/faker/dist/airline-eVQV6kbz';
-import { calendar } from '../../../utils/calenar';
+import { DatePicker } from '../../components/datepicker/datePicker';
+import { ButtonComponent } from '../../components/button/button';
+import { RadioButtonComponent } from '../../components/radioButton/radioButton';
+import { InputComponent } from '../../components/input/input';
+import { Page } from 'playwright';
+import { CheckBoxComponent } from '../../components/checkBox/checkBox';
 
 export class RegisterPage extends GlobalPage {
-  readonly firstName: Locator;
-  readonly lastName: Locator;
-  readonly email: Locator;
-  readonly reEnterEmail: Locator;
-  readonly userName: Locator;
-  readonly password: Locator;
-  readonly birthDate: Locator;
-  readonly gender: Locator;
-  readonly checkRules: Locator;
-  readonly createAccountButton: Locator;
+  readonly datePicker: DatePicker;
+  readonly firstNameInput: InputComponent;
+  readonly lastNameInput: InputComponent;
+  readonly emailInput: InputComponent;
+  readonly userNameInput: InputComponent;
+  readonly passwordInput: InputComponent;
+  readonly reEnterEmailInput: InputComponent;
+  readonly genderRadioButton: RadioButtonComponent;
+  readonly checkBoxRulesButton: CheckBoxComponent;
+  readonly createAccountButton: ButtonComponent;
 
   constructor(page: Page) {
-    super(page);
+    super(page, '/');
 
-    this.firstName = page.getByRole('textbox', { name: 'First Name' });
-    this.lastName = page.getByRole('textbox', { name: 'Last Name' });
-    this.email = page.getByRole('textbox', { name: 'Email', exact: true });
-    this.reEnterEmail = page.getByRole('textbox', { name: 'Re-enter Email' });
-    this.userName = page.getByRole('textbox', { name: 'Username' });
-    this.password = page.getByRole('textbox', { name: 'Password' });
-    this.birthDate = page.getByRole('textbox', { name: 'Birthdate' });
-    this.gender = page.getByRole('radio'); //.nth() в зависимости от кнопки на рандоме
-    this.checkRules = page.getByRole('checkbox');
-    this.createAccountButton = page.getByRole('button', { name: 'Create an account' });
+    const genderList = ['Male', 'Female', 'Other'];
+    const random = Math.floor(Math.random() * genderList.length);
+
+    this.datePicker = new DatePicker(
+      this.page.getByRole('textbox', { name: 'Birthdate' }),
+      this.page.locator("//div[@id='ui-datepicker-div']"),
+    );
+
+    this.firstNameInput = new InputComponent(
+      this.page.getByRole('textbox', { name: 'First Name' }),
+    );
+    this.lastNameInput = new InputComponent(this.page.getByRole('textbox', { name: 'Last Name' }));
+    this.userNameInput = new InputComponent(this.page.getByRole('textbox', { name: 'Username' }));
+    this.emailInput = new InputComponent(
+      this.page.getByRole('textbox', { name: 'Email', exact: true }),
+    );
+    this.passwordInput = new InputComponent(this.page.getByRole('textbox', { name: 'Password' }));
+    this.reEnterEmailInput = new InputComponent(
+      this.page.getByRole('textbox', { name: 'Re-enter Email' }),
+    );
+    this.genderRadioButton = new RadioButtonComponent(this.page.getByRole('radio').nth(random)); //nth рандом
+    this.checkBoxRulesButton = new CheckBoxComponent(this.page.getByRole('checkbox'));
+
+    this.createAccountButton = new ButtonComponent(
+      this.page.getByRole('button', { name: 'Create an account' }),
+    );
   }
 
   async createdAccount(
@@ -38,35 +56,17 @@ export class RegisterPage extends GlobalPage {
     username: string,
     password: string,
   ): Promise<void> {
-    const genderList = ['Male', 'Female', 'Other'];
-    const random = Math.floor(Math.random() * genderList.length);
-
-    await this.firstName.fill(firstName);
-    expect(this.firstName.fill(firstName));
-
-    await this.lastName.fill(lastName);
-    expect(this.lastName.fill(lastName));
-
-    await this.email.fill(email);
-    expect(this.email.fill(email));
-
-    await this.reEnterEmail.fill(email);
-    expect(this.reEnterEmail.fill(email));
-
-    await this.userName.fill(username);
-    expect(this.userName.fill(username));
-
-    await this.password.fill(password);
-    expect(this.password.fill(password));
-
-    await calendar(this);
-
-    await this.gender.nth(random).click();
-    await expect(this.gender.nth(random)).toBeChecked();
-
-    await this.checkRules.click();
-    await expect(this.checkRules).toBeChecked();
-
-    await this.page.pause();
+    await this.firstNameInput.setValue(firstName);
+    await this.lastNameInput.setValue(lastName);
+    await this.emailInput.setValue(email);
+    await this.reEnterEmailInput.setValue(email);
+    await this.userNameInput.setValue(username);
+    await this.passwordInput.setValue(password);
+    await this.datePicker.setDate();
+    await this.genderRadioButton.click();
+    await this.genderRadioButton.isChecked();
+    await this.checkBoxRulesButton.click();
+    await this.checkBoxRulesButton.isChecked();
+    await this.createAccountButton.click();
   }
 }
