@@ -1,23 +1,15 @@
 import { RegisterPage } from '../src/page/registerPage/registerPage';
-import { test } from '@playwright/test';
-import { BuildersGenerete } from '../utils/buildersGenerate';
+import { test } from '../src/fixtures/playwright.fixture';
 
-test('Регистрация пользователя', async ({ page }) => {
+test('Регистрация пользователя', async ({ page, userData }) => {
   const registerPage = new RegisterPage(page);
-  const user = new BuildersGenerete()
-    .withFirstName()
-    .withLastName()
-    .withEmail()
-    .withUsername()
-    .withPassword()
-    .build();
 
-  await registerPage.visit('/');
+  await registerPage.visit();
   await registerPage.createdAccount(
-    user.firstName,
-    user.lastName,
-    user.email,
-    user.username,
-    user.password,
+    userData.firstName,
+    userData.lastName,
+    userData.email,
+    userData.username,
+    userData.password,
   );
 });
