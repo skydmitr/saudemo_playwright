@@ -1,7 +1,7 @@
 import { expect } from 'playwright/test';
 import { Locator } from 'playwright';
 
-export class BaseComponent {
+export class BaseOmponent {
   protected locator: Locator;
 
   constructor(locator: Locator) {

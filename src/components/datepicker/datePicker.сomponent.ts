@@ -1,7 +1,7 @@
 import { Locator } from '@playwright/test';
 import { faker } from '@faker-js/faker';
 
-export class DatePicker {
+export class DatePickerOmponent {
   readonly inputDatePickerLocator: Locator;
   readonly datePickerLocator: Locator;
 
