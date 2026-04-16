@@ -1,13 +1,13 @@
 import { GlobalPage } from '../globalPage/globalPage';
-import { DatePicker } from '../../components/datepicker/datePicker';
-import { ButtonComponent } from '../../components/button/button';
-import { RadioButtonComponent } from '../../components/radioButton/radioButton';
-import { InputComponent } from '../../components/input/input';
+import { DatePickerOmponent } from '../../components/datepicker/datePicker.сomponent';
+import { ButtonComponent } from '../../components/button/button.сomponent';
+import { RadioButtonComponent } from '../../components/radioButton/radioButton.сomponent';
+import { InputComponent } from '../../components/input/input.сomponent';
 import { Page } from 'playwright';
-import { CheckBoxComponent } from '../../components/checkBox/checkBox';
+import { CheckBoxComponent } from '../../components/checkBox/checkBox.сomponent';
 
 export class RegisterPage extends GlobalPage {
-  readonly datePicker: DatePicker;
+  readonly datePicker: DatePickerOmponent;
   readonly firstNameInput: InputComponent;
   readonly lastNameInput: InputComponent;
   readonly emailInput: InputComponent;
@@ -24,7 +24,7 @@ export class RegisterPage extends GlobalPage {
     const genderList = ['Male', 'Female', 'Other'];
     const random = Math.floor(Math.random() * genderList.length);
 
-    this.datePicker = new DatePicker(
+    this.datePicker = new DatePickerOmponent(
       this.page.getByRole('textbox', { name: 'Birthdate' }),
       this.page.locator("//div[@id='ui-datepicker-div']"),
     );

@@ -1,8 +1,8 @@
 import { Locator, Page } from 'playwright';
 import { expect } from '@playwright/test';
 import { GlobalPage } from '../globalPage/globalPage';
-import { InputComponent } from '../../components/input/input';
-import { ButtonComponent } from '../../components/button/button';
+import { InputComponent } from '../../components/input/input.сomponent';
+import { ButtonComponent } from '../../components/button/button.сomponent';
 
 export class LoginPage extends GlobalPage {
   readonly loginInput: InputComponent;
@@ -21,8 +21,8 @@ export class LoginPage extends GlobalPage {
     const login = await this.loginInput.getValue();
     const password = await this.passwordInput.getValue();
 
-    expect(login).toEqual(process.env.IDEALOGIN);
-    expect(password).toEqual(process.env.IDELPASSWORD);
+    expect(login).toEqual(process.env.LOGIN);
+    expect(password).toEqual(process.env.PASSWORD);
 
     await this.loginButton.click();
     await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`);

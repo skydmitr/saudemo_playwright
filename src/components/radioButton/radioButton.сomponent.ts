@@ -1,8 +1,8 @@
 import { Locator } from 'playwright';
 import { expect } from '@playwright/test';
-import { BaseComponent } from '../baseComponentForButton/baseComponent';
+import { BaseOmponent } from '../baseComponentForButton/base.сomponent';
 
-export class RadioButtonComponent extends BaseComponent {
+export class RadioButtonComponent extends BaseOmponent {
   readonly radioButton: Locator;
 
   constructor(radioButton: Locator) {
