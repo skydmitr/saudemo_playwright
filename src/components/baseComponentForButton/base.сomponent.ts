@@ -1,30 +1,35 @@
-import { expect } from 'playwright/test';
+import { expect } from '../../fixtures/playwright.fixture';
 import { Locator } from 'playwright';
+//TODO стараемся везде импортируем базовую фикстуру!
 
-export class BaseOmponent {
+export class BaseComponent {
   protected locator: Locator;
 
   constructor(locator: Locator) {
     this.locator = locator;
   }
 
-  async isVisible(): Promise<void> {
+  async expectVisible(): Promise<void> {
     await expect(this.locator).toBeVisible();
   }
 
-  async isEnabled(): Promise<void> {
+  async expectEnabled(): Promise<void> {
     await expect(this.locator).toBeEnabled();
   }
 
-  async isDisabled(): Promise<void> {
+  async expectDisabled(): Promise<void> {
     await expect(this.locator).toBeDisabled();
   }
 
-  async isNotVisible(): Promise<void> {
+  async expectNotVisible(): Promise<void> {
     await expect(this.locator).not.toBeVisible();
   }
 
   async click(): Promise<void> {
     await this.locator.click();
+  }
+
+  async expectText(value: string): Promise<void> {
+    await expect(this.locator).toContainText(value);
   }
 }

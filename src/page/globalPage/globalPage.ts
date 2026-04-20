@@ -3,9 +3,9 @@ import { expect } from '@playwright/test';
 
 export class GlobalPage {
   readonly page: Page;
-  protected url?: string;
+  protected url: string;
 
-  constructor(page: Page, url?: string) {
+  constructor(page: Page, url: string = '/') {
     this.page = page;
     this.url = url;
   }

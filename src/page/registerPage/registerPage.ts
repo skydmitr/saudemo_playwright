@@ -1,13 +1,17 @@
 import { GlobalPage } from '../globalPage/globalPage';
-import { DatePickerOmponent } from '../../components/datepicker/datePicker.сomponent';
+import { DatePickerComponent } from '../../components/datepicker/datePicker.сomponent';
 import { ButtonComponent } from '../../components/button/button.сomponent';
 import { RadioButtonComponent } from '../../components/radioButton/radioButton.сomponent';
 import { InputComponent } from '../../components/input/input.сomponent';
 import { Page } from 'playwright';
 import { CheckBoxComponent } from '../../components/checkBox/checkBox.сomponent';
+import { EmailHelper } from '../../helpers/mail/mail';
+import { ok } from 'node:assert/strict';
+import { BaseComponent } from '../../components/baseComponentForButton/base.сomponent';
+import { expect } from '@playwright/test';
 
 export class RegisterPage extends GlobalPage {
-  readonly datePicker: DatePickerOmponent;
+  readonly datePicker: DatePickerComponent;
   readonly firstNameInput: InputComponent;
   readonly lastNameInput: InputComponent;
   readonly emailInput: InputComponent;
@@ -17,14 +21,14 @@ export class RegisterPage extends GlobalPage {
   readonly genderRadioButton: RadioButtonComponent;
   readonly checkBoxRulesButton: CheckBoxComponent;
   readonly createAccountButton: ButtonComponent;
+  readonly successRegister: BaseComponent;
 
   constructor(page: Page) {
-    super(page, '/');
+    super(page);
 
-    const genderList = ['Male', 'Female', 'Other'];
-    const random = Math.floor(Math.random() * genderList.length);
-
-    this.datePicker = new DatePickerOmponent(
+    //const genderList = ['Male', 'Female', 'Other']; //TODO пока не импользуем массив гендеров
+    const random = Math.floor(Math.random() * 3);
+    this.datePicker = new DatePickerComponent(
       this.page.getByRole('textbox', { name: 'Birthdate' }),
       this.page.locator("//div[@id='ui-datepicker-div']"),
     );
@@ -41,15 +45,16 @@ export class RegisterPage extends GlobalPage {
     this.reEnterEmailInput = new InputComponent(
       this.page.getByRole('textbox', { name: 'Re-enter Email' }),
     );
-    this.genderRadioButton = new RadioButtonComponent(this.page.getByRole('radio').nth(random)); //nth рандом
+    this.genderRadioButton = new RadioButtonComponent(this.page.getByRole('radio').nth(random));
     this.checkBoxRulesButton = new CheckBoxComponent(this.page.getByRole('checkbox'));
 
     this.createAccountButton = new ButtonComponent(
       this.page.getByRole('button', { name: 'Create an account' }),
     );
+    this.successRegister = new BaseComponent(this.page.getByText('Your account has been'));
   }
 
-  async createdAccount(
+  async createAccount(
     firstName: string,
     lastName: string,
     email: string,
@@ -64,9 +69,31 @@ export class RegisterPage extends GlobalPage {
     await this.passwordInput.setValue(password);
     await this.datePicker.setDate();
     await this.genderRadioButton.click();
-    await this.genderRadioButton.isChecked();
+    await this.genderRadioButton.expectChecked();
     await this.checkBoxRulesButton.click();
-    await this.checkBoxRulesButton.isChecked();
+    await this.checkBoxRulesButton.expectChecked(); //TODO дописать метод для чекбокса
     await this.createAccountButton.click();
+    await this.successRegister.expectText('Your account has been registered!');
+  }
+
+  async approveRegister(
+    firstName: string,
+    lastName: string,
+    username: string,
+    password: string,
+  ): Promise<{ email: string }> {
+    const emailHelper = new EmailHelper();
+    const inboxObject = await emailHelper.createInbox();
+    const { emailAddress, id } = inboxObject;
+    await this.createAccount(firstName, lastName, emailAddress, username, password);
+    const body = await emailHelper.waitForEmail(id, 90000, true);
+    ok(body);
+    const link = await emailHelper.getActiviteLink(body);
+    ok(link);
+    await this.page.goto(link[0]);
+    await expect(this.page.getByText('The account has been validated!')).toBeVisible();
+    return {
+      email: emailAddress,
+    };
   }
 }

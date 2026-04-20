@@ -10,21 +10,27 @@ export class LoginPage extends GlobalPage {
   readonly loginButton: ButtonComponent;
 
   constructor(page: Page) {
-    super(page, '/login');
+    super(page, '/home');
 
     this.loginInput = new InputComponent(page.locator('input[name="username"]'));
     this.passwordInput = new InputComponent(page.locator('input[name="password"]'));
     this.loginButton = new ButtonComponent(page.getByRole('button', { name: 'Login' }));
   }
 
-  async login(): Promise<void> {
-    const login = await this.loginInput.getValue();
-    const password = await this.passwordInput.getValue();
+  async login(email?: string, password?: string): Promise<void> {
+    const loginOptional = email ?? (await this.loginInput.getValue());
+    const passwordOptional = password ?? (await this.passwordInput.getValue());
 
-    expect(login).toEqual(process.env.LOGIN);
-    expect(password).toEqual(process.env.PASSWORD);
-
+    if (!email && !password) {
+      expect(loginOptional).toEqual(process.env.LOGIN);
+      expect(passwordOptional).toEqual(process.env.PASSWORD);
+    } else {
+      await this.loginInput.setValue(loginOptional);
+      await this.passwordInput.setValue(passwordOptional);
+    }
     await this.loginButton.click();
     await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`);
   }
 }
+
+//TODO поправить метод getValue и адаптировать
