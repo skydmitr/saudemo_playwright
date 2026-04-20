@@ -1,24 +1,21 @@
 import { Locator } from 'playwright';
 import { expect } from '@playwright/test';
-import { BaseOmponent } from '../baseComponentForButton/base.сomponent';
+import { BaseComponent } from '../baseComponentForButton/base.сomponent';
 
-export class InputComponent extends BaseOmponent {
-  readonly inputLocator: Locator;
-
+export class InputComponent extends BaseComponent {
   constructor(inputLocator: Locator) {
     super(inputLocator);
-    this.inputLocator = inputLocator;
   }
 
   async setValue(text: string): Promise<void> {
-    await this.inputLocator.fill(text);
+    await this.locator.fill(text);
   }
 
-  async getValue(): Promise<void> {
-    await this.inputLocator.inputValue();
-  }
+  async getValue(): Promise<string> {
+    return this.locator.inputValue();
+  } //TODO поправить?
 
   async checkValue(text: string): Promise<void> {
-    await expect(this.inputLocator).toHaveValue(text);
-  }
+    await expect(this.locator).toHaveValue(text);
+  } //TODO поправить?
 }

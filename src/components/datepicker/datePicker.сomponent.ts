@@ -1,29 +1,22 @@
 import { Locator } from '@playwright/test';
 import { faker } from '@faker-js/faker';
+import { BaseComponent } from '../baseComponentForButton/base.сomponent';
 
-export class DatePickerOmponent {
-  readonly inputDatePickerLocator: Locator;
+export class DatePickerComponent extends BaseComponent {
   readonly datePickerLocator: Locator;
+  readonly getYear: number;
+  readonly getMonth: number;
+  readonly getDaysMonth: number;
+  readonly getDay: number;
 
   constructor(inputDatePickerLocator: Locator, datePickerLocator: Locator) {
-    this.inputDatePickerLocator = inputDatePickerLocator;
+    super(inputDatePickerLocator);
     this.datePickerLocator = datePickerLocator;
-  }
 
-  private _getYear() {
-    return faker.number.int({ min: 1900, max: 2026 });
-  }
-
-  private _getMonth() {
-    return faker.number.int({ min: 0, max: 11 });
-  }
-
-  private _getDaysMonth() {
-    return new Date(this._getYear(), this._getMonth() + 1, 0).getDate();
-  }
-
-  private _getDay() {
-    return faker.number.int({ min: 1, max: this._getDaysMonth() });
+    this.getYear = faker.number.int({ min: 1900, max: new Date().getFullYear() });
+    this.getMonth = faker.number.int({ min: 0, max: 11 });
+    this.getDaysMonth = new Date(this.getYear, this.getMonth + 1, 0).getDate();
+    this.getDay = faker.number.int({ min: 1, max: this.getDaysMonth });
   }
 
   async setMonth(month: number) {
@@ -39,11 +32,11 @@ export class DatePickerOmponent {
   }
 
   async setDate(
-    day: number = this._getDay(),
-    month: number = this._getMonth(),
-    year: number = this._getYear(),
-  ) {
-    await this.inputDatePickerLocator.click();
+    day: number = this.getDay,
+    month: number = this.getMonth,
+    year: number = this.getYear,
+  ): Promise<void> {
+    await this.locator.click();
     await this.setYear(year);
     await this.setMonth(month);
     await this.setDay(day);

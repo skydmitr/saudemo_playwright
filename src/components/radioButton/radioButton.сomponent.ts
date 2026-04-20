@@ -1,20 +1,19 @@
 import { Locator } from 'playwright';
 import { expect } from '@playwright/test';
-import { BaseOmponent } from '../baseComponentForButton/base.сomponent';
+import { BaseComponent } from '../baseComponentForButton/base.сomponent';
 
-export class RadioButtonComponent extends BaseOmponent {
-  readonly radioButton: Locator;
-
+export class RadioButtonComponent extends BaseComponent {
   constructor(radioButton: Locator) {
     super(radioButton);
-    this.radioButton = radioButton;
   }
 
-  async isChecked() {
-    await expect(this.radioButton).toBeChecked();
+  async expectChecked() {
+    await expect(this.locator).toBeChecked();
   }
 
-  async isNotChecked() {
-    await expect(this.radioButton).not.toBeChecked();
+  async expectNotChecked() {
+    await expect(this.locator).not.toBeChecked();
   }
 }
+
+//TODO переименование названий методой, придерживаться мнимого согласия
