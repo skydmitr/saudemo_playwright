@@ -2,9 +2,7 @@ import { RegisterPage } from '../src/page/registerPage/registerPage';
 import { test } from '../src/fixtures/playwright.fixture';
 import { LoginPage } from '../src/page/loginPage/loginPage';
 
-test('Регистрация пользователя', async ({ page, userData }) => {
-  const registerPage = new RegisterPage(page);
-
+test('Регистрация пользователя', async ({ registerPage, userData }) => {
   await registerPage.visit();
   await registerPage.createAccount(
     userData.firstName,
@@ -15,15 +13,17 @@ test('Регистрация пользователя', async ({ page, userData 
   );
 });
 
-test('Регистрация -> активация -> авторизация', async ({ page, userData }) => {
-  const registerPage = new RegisterPage(page);
-  const loginPage = new LoginPage(page);
-
+test('Регистрация -> активация -> авторизация', async ({
+  registerPage,
+  loginPage,
+  homePage,
+  userData,
+}) => {
   await test.step('Открытие страницы регистрации', async () => {
     await registerPage.visit();
   });
 
-  const user = await test.step('Регистрация и активация аккаунта', async () => {
+  const email = await test.step('Регистрация и активация аккаунта', async () => {
     return await registerPage.approveRegister(
       userData.firstName,
       userData.lastName,
@@ -37,7 +37,7 @@ test('Регистрация -> активация -> авторизация', a
   });
 
   await test.step('Авторизация', async () => {
-    await loginPage.login(user.email, userData.password);
-    await loginPage.expectedUrlPage();
+    await loginPage.login(email, userData.password);
+    await homePage.expectedUrlPage();
   });
 });

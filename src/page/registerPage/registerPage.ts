@@ -8,7 +8,7 @@ import { CheckBoxComponent } from '../../components/checkBox/checkBox.сomponent
 import { EmailHelper } from '../../helpers/mail/mail';
 import { ok } from 'node:assert/strict';
 import { BaseComponent } from '../../components/baseComponentForButton/base.сomponent';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 export class RegisterPage extends GlobalPage {
   readonly datePicker: DatePickerComponent;
@@ -61,19 +61,21 @@ export class RegisterPage extends GlobalPage {
     username: string,
     password: string,
   ): Promise<void> {
-    await this.firstNameInput.setValue(firstName);
-    await this.lastNameInput.setValue(lastName);
-    await this.emailInput.setValue(email);
-    await this.reEnterEmailInput.setValue(email);
-    await this.userNameInput.setValue(username);
-    await this.passwordInput.setValue(password);
-    await this.datePicker.setDate();
-    await this.genderRadioButton.click();
-    await this.genderRadioButton.expectChecked();
-    await this.checkBoxRulesButton.click();
-    await this.checkBoxRulesButton.expectChecked(); //TODO дописать метод для чекбокса
-    await this.createAccountButton.click();
-    await this.successRegister.expectText('Your account has been registered!');
+    await test.step('Создание пользователя', async () => {
+      await this.firstNameInput.setValue(firstName);
+      await this.lastNameInput.setValue(lastName);
+      await this.emailInput.setValue(email);
+      await this.reEnterEmailInput.setValue(email);
+      await this.userNameInput.setValue(username);
+      await this.passwordInput.setValue(password);
+      await this.datePicker.setDate();
+      await this.genderRadioButton.click();
+      await this.genderRadioButton.expectChecked();
+      await this.checkBoxRulesButton.click();
+      await this.checkBoxRulesButton.expectChecked(); //TODO дописать метод для чекбокса
+      await this.createAccountButton.click();
+      await this.successRegister.expectText('Your account has been registered!');
+    });
   }
 
   async approveRegister(
@@ -81,19 +83,19 @@ export class RegisterPage extends GlobalPage {
     lastName: string,
     username: string,
     password: string,
-  ): Promise<{ email: string }> {
-    const emailHelper = new EmailHelper();
-    const inboxObject = await emailHelper.createInbox();
-    const { emailAddress, id } = inboxObject;
-    await this.createAccount(firstName, lastName, emailAddress, username, password);
-    const body = await emailHelper.waitForEmail(id, 90000, true);
-    ok(body);
-    const link = await emailHelper.getActiviteLink(body);
-    ok(link);
-    await this.page.goto(link[0]);
-    await expect(this.page.getByText('The account has been validated!')).toBeVisible();
-    return {
-      email: emailAddress,
-    };
+  ): Promise<string> {
+    return await test.step('Подтверждение почты при регистрации', async () => {
+      const emailHelper = new EmailHelper();
+      const inboxObject = await emailHelper.createInbox();
+      const { emailAddress, id } = inboxObject;
+      await this.createAccount(firstName, lastName, emailAddress, username, password);
+      const body = await emailHelper.waitForEmail(id, 90000, true);
+      ok(body);
+      const link = await emailHelper.getActiviteLink(body);
+      ok(link);
+      await this.page.goto(link[0]);
+      await expect(this.page.getByText('The account has been validated!')).toBeVisible();
+      return emailAddress;
+    });
   }
 }

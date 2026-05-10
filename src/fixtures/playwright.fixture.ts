@@ -1,5 +1,9 @@
 import { test as base } from '@playwright/test';
 import { faker } from '@faker-js/faker';
+import { GlobalPage } from '../page/globalPage/globalPage';
+import { LoginPage } from '../page/loginPage/loginPage';
+import { RegisterPage } from '../page/registerPage/registerPage';
+import { HomePage } from '../page/homePage/homePage';
 
 export interface UserData {
   firstName: string;
@@ -11,6 +15,9 @@ export interface UserData {
 
 type MyFixtures = {
   userData: UserData;
+  loginPage: LoginPage;
+  registerPage: RegisterPage;
+  homePage: HomePage;
 };
 
 export const test = base.extend<MyFixtures>({
@@ -27,6 +34,24 @@ export const test = base.extend<MyFixtures>({
     });
 
     //todo выполнится после того как тест закончится
+  },
+
+  loginPage: async ({ page }, use) => {
+    const loginPage = new LoginPage(page);
+
+    await use(loginPage);
+  },
+
+  registerPage: async ({ page }, use) => {
+    const registerPage = new RegisterPage(page);
+
+    await use(registerPage);
+  },
+
+  homePage: async ({ page }, use) => {
+    const homePage = new HomePage(page);
+
+    await use(homePage);
   },
 });
 
