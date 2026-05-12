@@ -1,5 +1,5 @@
 import { Locator, Page } from 'playwright';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { GlobalPage } from '../globalPage/globalPage';
 import { InputComponent } from '../../components/input/input.сomponent';
 import { ButtonComponent } from '../../components/button/button.сomponent';
@@ -10,7 +10,7 @@ export class LoginPage extends GlobalPage {
   readonly loginButton: ButtonComponent;
 
   constructor(page: Page) {
-    super(page, '/home');
+    super(page, '/login');
 
     this.loginInput = new InputComponent(page.locator('input[name="username"]'));
     this.passwordInput = new InputComponent(page.locator('input[name="password"]'));
@@ -18,18 +18,20 @@ export class LoginPage extends GlobalPage {
   }
 
   async login(email?: string, password?: string): Promise<void> {
-    const loginOptional = email ?? (await this.loginInput.getValue());
-    const passwordOptional = password ?? (await this.passwordInput.getValue());
+    await test.step('Авторизация пользователя', async (async) => {
+      const loginOptional = email ?? (await this.loginInput.getValue());
+      const passwordOptional = password ?? (await this.passwordInput.getValue());
 
-    if (!email && !password) {
-      expect(loginOptional).toEqual(process.env.LOGIN);
-      expect(passwordOptional).toEqual(process.env.PASSWORD);
-    } else {
-      await this.loginInput.setValue(loginOptional);
-      await this.passwordInput.setValue(passwordOptional);
-    }
-    await this.loginButton.click();
-    await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`);
+      if (!email && !password) {
+        expect(loginOptional).toEqual(process.env.LOGIN);
+        expect(passwordOptional).toEqual(process.env.PASSWORD);
+      } else {
+        await this.loginInput.setValue(loginOptional);
+        await this.passwordInput.setValue(passwordOptional);
+      }
+      await this.loginButton.click();
+      await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`);
+    });
   }
 }
 

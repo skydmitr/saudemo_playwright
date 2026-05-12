@@ -1,5 +1,5 @@
 import { Page } from 'playwright';
-import { expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 export class GlobalPage {
   readonly page: Page;
@@ -11,10 +11,14 @@ export class GlobalPage {
   }
 
   async visit(): Promise<void> {
-    await this.page.goto(process.env.SITE + `${this.url}`);
+    await test.step('Переход на страницу', async (async) => {
+      await this.page.goto(process.env.SITE + `${this.url}`);
+    });
   }
 
   async expectedUrlPage(): Promise<void> {
-    await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`);
+    await test.step('Проверка нахождения на странице', async (async) => {
+      await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`);
+    });
   }
 }
