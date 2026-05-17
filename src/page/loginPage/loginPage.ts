@@ -3,6 +3,10 @@ import { expect, test } from '@playwright/test';
 import { GlobalPage } from '../globalPage/globalPage';
 import { InputComponent } from '../../components/input/input.сomponent';
 import { ButtonComponent } from '../../components/button/button.сomponent';
+import { Role } from '../../data/role';
+import { creds } from '../../data/creds';
+import { User } from '../../role/user';
+import { ok } from 'node:assert/strict';
 
 export class LoginPage extends GlobalPage {
   readonly loginInput: InputComponent;
@@ -30,8 +34,20 @@ export class LoginPage extends GlobalPage {
         await this.passwordInput.setValue(passwordOptional);
       }
       await this.loginButton.click();
-      await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`);
+      //await expect(this.page).toHaveURL(process.env.SITE + `${this.url}`); Это нам тут не нужно
     });
+  }
+
+  async loginAsRole(role: Role, user?: User): Promise<void> {
+    await this.visit();
+    if (role === Role.Admin) {
+      await this.login(creds.adminLogin, creds.adminPassword);
+    } else if (role === Role.User) {
+      ok(user); //проверка
+      await this.login(user.email, user.password);
+    } else {
+      throw new Error(`Роль не поддерживается ${role}`);
+    } //добавить проверку авторизации, степы переделать под аллюр
   }
 }
 

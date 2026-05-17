@@ -4,6 +4,8 @@ import { GlobalPage } from '../page/globalPage/globalPage';
 import { LoginPage } from '../page/loginPage/loginPage';
 import { RegisterPage } from '../page/registerPage/registerPage';
 import { HomePage } from '../page/homePage/homePage';
+import { Admin } from '../role/admin';
+import { User } from '../role/user';
 
 export interface UserData {
   firstName: string;
@@ -18,6 +20,8 @@ type MyFixtures = {
   loginPage: LoginPage;
   registerPage: RegisterPage;
   homePage: HomePage;
+  adminRole: Admin;
+  userRole: User;
 };
 
 export const test = base.extend<MyFixtures>({
@@ -52,6 +56,19 @@ export const test = base.extend<MyFixtures>({
     const homePage = new HomePage(page);
 
     await use(homePage);
+  },
+
+  adminRole: async ({ page }, use) => {
+    const adminRole = new Admin(page);
+
+    await use(adminRole);
+  },
+
+  userRole: async ({ page, userData }, use) => {
+    const user = userData;
+    const userRole = new User(page, user.email, user.password);
+
+    await use(userRole);
   },
 });
 

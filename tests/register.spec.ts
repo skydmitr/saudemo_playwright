@@ -19,25 +19,17 @@ test('Регистрация -> активация -> авторизация', a
   homePage,
   userData,
 }) => {
-  await test.step('Открытие страницы регистрации', async () => {
-    await registerPage.visit();
-  });
+  await registerPage.visit();
 
-  const email = await test.step('Регистрация и активация аккаунта', async () => {
-    return await registerPage.approveRegister(
-      userData.firstName,
-      userData.lastName,
-      userData.username,
-      userData.password,
-    );
-  });
+  const email = await registerPage.approveRegister(
+    userData.firstName,
+    userData.lastName,
+    userData.username,
+    userData.password,
+  );
 
-  await test.step('Переход на страницу авторизации', async () => {
-    await loginPage.visit();
-  });
+  await loginPage.visit();
 
-  await test.step('Авторизация', async () => {
-    await loginPage.login(email, userData.password);
-    await homePage.expectedUrlPage();
-  });
+  await loginPage.login(email, userData.password);
+  await homePage.expectedUrlPage();
 });
